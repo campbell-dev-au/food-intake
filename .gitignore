@@ -1,0 +1,57 @@
+## .NET build output
+bin/
+obj/
+out/
+
+## Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+
+## Rider / ReSharper
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+
+## VS Code
+.vscode/
+!.vscode/extensions.json
+
+## NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+## Local databases and design-time artifacts
+## The real, persistent database lives outside the repo (see setup guide
+## section 8) — nothing named food.db should ever end up in here anyway,
+## but this also catches any *.db created by the design-time factory or
+## ad-hoc local testing.
+*.db
+*.db-shm
+*.db-wal
+design_time.db
+
+## User-specific project files that shouldn't be shared between machines
+*.userprefs
+
+## macOS
+.DS_Store
+
+## Avalonia / Rider preview cache
+*.AvaloniaPreviewer/
+
+## Secrets — nothing here yet, but if appsettings.Development.json or a
+## local secrets file ever appears, keep it out from the start rather than
+## remembering to add it after the fact.
+appsettings.*.local.json
+secrets.json

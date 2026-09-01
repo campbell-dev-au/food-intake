@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FoodIntake.App/FoodIntake.App.csproj" />
+    <Project Path="src/FoodIntake.Classification/FoodIntake.Classification.csproj" />
+    <Project Path="src/FoodIntake.Data/FoodIntake.Data.csproj" />
+    <Project Path="src/FoodIntake.Domain/FoodIntake.Domain.csproj" />
+    <Project Path="src/FoodIntake.Import/FoodIntake.Import.csproj" />
+    <Project Path="src/FoodIntake.Reporting/FoodIntake.Reporting.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FoodIntake.Tests/FoodIntake.Tests.csproj" />
+  </Folder>
+</Solution>
