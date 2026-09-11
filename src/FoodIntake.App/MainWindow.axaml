@@ -1,9 +1,47 @@
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="FoodIntake.App.MainWindow"
-        Title="FoodIntake.App">
-    Welcome to Avalonia!
+  xmlns:domain="using:FoodIntake.Domain"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:FoodIntake.App.ViewModels"
+  mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="450"
+  x:Class="FoodIntake.App.MainWindow"
+  x:DataType="vm:ProjectsViewModel"
+  Title="Food Intake"
+  Width="700" Height="450"
+  >
+  <Grid ColumnDefinitions="420,*" Margin="12">
+    <DockPanel Grid.Column="0" Margin="0,0,12,0">
+      <TextBlock DockPanel.Dock="Top" Text="Projects" FontWeight="Bold" Margin="0,0,0,6"/>
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
+        <TextBox PlaceholderText="New project name" Text="{Binding NewProjectName, Mode=TwoWay}" Width="150"/>
+        <Button Content="Add" Command="{Binding AddProjectCommand}" Margin="6,0,0,0"/>
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject, Mode=TwoWay}">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="domain:Project">
+            <TextBox Text="{Binding Name}"/>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <DockPanel Grid.Column="1">
+      <TextBlock DockPanel.Dock="Top" Text="Time Points" FontWeight="Bold" Margin="0,0,0,6"/>
+      <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
+        <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" Margin="0,0,0,4"/>
+        <StackPanel Orientation="Horizontal">
+          <TextBox PlaceholderText="New time point name" Text="{Binding NewTimePointName, Mode=TwoWay}" Width="150"/>
+          <Button Content="Add" Command="{Binding AddTimePointCommand}" Margin="6,0,0,0"/>
+        </StackPanel>
+      </StackPanel>
+      <ListBox ItemsSource="{Binding TimePoints}">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="domain:TimePoint">
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+  </Grid>
 </Window>

@@ -5,38 +5,41 @@ using Microsoft.Extensions.DependencyInjection;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using FoodIntake.App.ViewModels;
 using FoodIntake.Data;
 
 namespace FoodIntake.App;
 
 public partial class App : Application
 {
-    public override void Initialize()
+  public override void Initialize()
+  {
+    AvaloniaXamlLoader.Load(this);
+  }
+
+  public override void OnFrameworkInitializationCompleted()
+  {
+    var dataDir = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "FoodIntake");
+    Directory.CreateDirectory(dataDir);
+    var dbPath = Path.Combine(dataDir, "food.db");
+
+    var services = new ServiceCollection();
+    services.AddDbContextFactory<AppDbContext>(o => o.UseSqlite($"Data Source={dbPath}"));
+    var provider = services.BuildServiceProvider();
+    var dbContextFactory = provider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+
+    using (var db = dbContextFactory.CreateDbContext())
     {
-        AvaloniaXamlLoader.Load(this);
+      db.Database.Migrate();
     }
 
-    public override void OnFrameworkInitializationCompleted()
+    if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
     {
-        var dataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "FoodIntake");
-        Directory.CreateDirectory(dataDir);
-        var dbPath = Path.Combine(dataDir, "food.db");
-        var services = new ServiceCollection();
-        services.AddDbContext<AppDbContext>(o => o.UseSqlite($"Data Source={dbPath}"));
-        var provider = services.BuildServiceProvider();
-
-        using (var scope = provider.CreateScope())
-        {
-            scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
-        }
-
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.MainWindow = new MainWindow();
-        }
-
-        base.OnFrameworkInitializationCompleted();
+      var viewModel = new ProjectsViewModel(dbContextFactory);
+      desktop.MainWindow = new MainWindow { DataContext = viewModel };
+      _ = viewModel.LoadProjectsAsync();
     }
+  }
 }

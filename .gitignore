@@ -47,6 +47,10 @@ design_time.db
 ## macOS
 .DS_Store
 
+## AI-generated implementation instructions (see CLAUDE.md) — working notes,
+## not part of the shipped project.
+instructions/
+
 ## Avalonia / Rider preview cache
 *.AvaloniaPreviewer/
 
