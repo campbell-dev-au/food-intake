@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<ProjectClient> ProjectClients => Set<ProjectClient>();
     public DbSet<FoodRecord> FoodRecords => Set<FoodRecord>();
+    public DbSet<Food> Foods => Set<Food>();
     public DbSet<MealSection> MealSections => Set<MealSection>();
     public DbSet<ConsumptionLine> Lines => Set<ConsumptionLine>();
     public DbSet<Nutrient> Nutrients => Set<Nutrient>();
@@ -17,6 +18,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Scheme> Schemes => Set<Scheme>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<FoodCategory> FoodCategories => Set<FoodCategory>();
+    public DbSet<Upload> Uploads => Set<Upload>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -36,7 +38,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
           .HasKey(pc => new { pc.ProjectId, pc.ClientId });
 
         model.Entity<FoodRecord>()
-          .HasIndex(r => r.RemoteResourceId)
+          .HasIndex(r => new { r.ProjectId, r.RemoteResourceId })
           .IsUnique();
 
         model.Entity<MealSection>()
@@ -67,5 +69,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         model.Entity<FoodCategory>()
           .HasKey(fc => new { fc.FoodId, fc.CategoryId });
 
+        model.Entity<Upload>()
+          .HasIndex(u => u.TimePointId)
+          .IsUnique();
     }
 }
