@@ -85,6 +85,8 @@ public static class FoodWorksImporter
                     RemoteResourceId = line.ResourceRemoteId,
                     Name = line.ResourceName
                 };
+                db.FoodRecords.Add(record);
+                foodRecords[line.ResourceRemoteId] = record;
             }
 
             if (!sections.TryGetValue(line.SectionName, out var section))
@@ -102,6 +104,8 @@ public static class FoodWorksImporter
                     ExternalFoodId = line.FoodRemoteId,
                     Name = line.FoodName
                 };
+                db.Foods.Add(food);
+                foods[(line.DataSourceId, line.FoodRemoteId)] = food;
             }
 
             var consumptionLine = new ConsumptionLine
