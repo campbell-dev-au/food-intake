@@ -1,0 +1,58 @@
+<Window xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:FoodIntake.App.ViewModels"
+  mc:Ignorable="d" d:DesignWidth="960" d:DesignHeight="600"
+  x:Class="FoodIntake.App.TimePointDataWindow"
+  x:DataType="vm:TimePointDataViewModel"
+  Title="{Binding Title}"
+  Width="960" Height="600">
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+      <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16"/>
+      <TextBlock Text="{Binding Summary}" Opacity="0.7"/>
+    </StackPanel>
+
+    <Grid ColumnDefinitions="*,320">
+      <DockPanel Grid.Column="0" Margin="0,0,12,0">
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="150,80,120,*,80" Margin="4,0,4,4">
+          <TextBlock Grid.Column="0" Text="Record" FontWeight="Bold"/>
+          <TextBlock Grid.Column="1" Text="Day" FontWeight="Bold"/>
+          <TextBlock Grid.Column="2" Text="Section" FontWeight="Bold"/>
+          <TextBlock Grid.Column="3" Text="Food" FontWeight="Bold"/>
+          <TextBlock Grid.Column="4" Text="Weight (g)" FontWeight="Bold"/>
+        </Grid>
+        <ListBox ItemsSource="{Binding Lines}" SelectedItem="{Binding SelectedLine, Mode=TwoWay}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:LineRow">
+              <Grid ColumnDefinitions="150,80,120,*,80">
+                <TextBlock Grid.Column="0" Text="{Binding RecordName}" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="1" Text="{Binding DayName}"/>
+                <TextBlock Grid.Column="2" Text="{Binding SectionName}"/>
+                <TextBlock Grid.Column="3" Text="{Binding FoodName}" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="4" Text="{Binding WeightG}"/>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+
+      <DockPanel Grid.Column="1">
+        <TextBlock DockPanel.Dock="Top" Text="Nutrients for selected line" FontWeight="Bold" Margin="0,0,0,4"/>
+        <ListBox ItemsSource="{Binding Nutrients}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:NutrientRow">
+              <Grid ColumnDefinitions="*,70,50">
+                <TextBlock Grid.Column="0" Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="1" Text="{Binding Value}" HorizontalAlignment="Right"/>
+                <TextBlock Grid.Column="2" Text="{Binding Unit}" Margin="6,0,0,0"/>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+    </Grid>
+  </DockPanel>
+</Window>
+
