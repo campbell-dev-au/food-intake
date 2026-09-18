@@ -39,11 +39,7 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
         try
         {
             await using var db = await _dbContextFactory.CreateDbContextAsync();
-            var projects = await db.Projects.OrderBy(p => p.Name).ToListAsync();
-
-            Projects.Clear();
-            foreach (var project in projects)
-                Projects.Add(project);
+            Projects.ReplaceAll(await db.Projects.OrderBy(p => p.Name).ToListAsync());
         }
         catch (Exception ex)
         {
