@@ -32,7 +32,7 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
     public partial Project? SelectedProject { get; set; }
 
     [ObservableProperty]
-    public partial string? StatusMessage { get; set; }
+    public partial StatusMessage? Status { get; set; }
 
     public async Task LoadProjectsAsync()
     {
@@ -47,23 +47,23 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Couldn't load projects: {ex.Message}";
+            Status = StatusMessage.Error($"Couldn't load projects: {ex.Message}");
         }
     }
 
     public async Task UploadAsync(string filePath)
     {
-        StatusMessage = null;
+        Status = null;
 
         if (SelectedTimePoint is null)
         {
-            StatusMessage = "Select a time point first.";
+            Status = StatusMessage.Error("Select a time point first.");
             return;
         }
 
         if (SelectedTimePoint.HasUpload)
         {
-            StatusMessage = "This time point already has an upload. Clear it first.";
+            Status = StatusMessage.Error("This time point already has an upload. Clear it first.");
             return;
         }
 
@@ -75,12 +75,12 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
             SelectedTimePoint.Upload = await db.Uploads
                 .SingleAsync(u => u.TimePointId == SelectedTimePoint.Id);
 
-            StatusMessage = $"Imported {summary.LineCount} lines across {summary.RecordCount} records.";
+            Status = StatusMessage.Success($"Imported {summary.LineCount} lines across {summary.RecordCount} records.");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine(ex);
-            StatusMessage = $"Couldn't import {ex.GetBaseException().Message}";
+            Status = StatusMessage.Error($"Couldn't import {ex.GetBaseException().Message}");
         }
     }
 
@@ -118,14 +118,14 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Couldn't load time points: {ex.Message}";
+            Status = StatusMessage.Error($"Couldn't load time points: {ex.Message}");
         }
     }
 
     [RelayCommand]
     private async Task AddProjectAsync()
     {
-        StatusMessage = null;
+        Status = null;
         var name = NewProjectName.Trim();
         if (name.Length == 0)
             return;
@@ -136,7 +136,7 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
 
             if (await db.Projects.AnyAsync(p => p.Name == name))
             {
-                StatusMessage = $"A project named '{name}' already exists.";
+                Status = StatusMessage.Error($"A project named '{name}' already exists.");
                 return;
             }
 
@@ -150,14 +150,14 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Couldn't add project: {ex.Message}";
+            Status = StatusMessage.Error($"Couldn't add project: {ex.Message}");
         }
     }
 
     [RelayCommand]
     public async Task ClearUploadAsync()
     {
-        StatusMessage = null;
+        Status = null;
         if (SelectedTimePoint is null || !SelectedTimePoint.HasUpload)
             return;
 
@@ -170,21 +170,21 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
             await db.Uploads.Where(u => u.TimePointId == timePointId).ExecuteDeleteAsync();
 
             SelectedTimePoint.Upload = null;
-            StatusMessage = "Cleared.";
+            Status = StatusMessage.Success("Cleared.");
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Couldn't clear: {ex.Message}";
+            Status = StatusMessage.Error($"Couldn't clear: {ex.Message}");
         }
     }
 
     public async Task<TimePointDataViewModel?> OpenSelectedTimePointAsync()
     {
-        StatusMessage = null;
+        Status = null;
 
         if (SelectedTimePoint is null)
         {
-            StatusMessage = "Select a time point first.";
+            Status = StatusMessage.Error("Select a time point first.");
             return null;
         }
 
@@ -196,7 +196,7 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Couldn't open time point: {ex.Message}";
+            Status = StatusMessage.Error($"Couldn't open time point: {ex.Message}");
             return null;
         }
     }
@@ -204,11 +204,11 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
     [RelayCommand]
     private async Task AddTimePointAsync()
     {
-        StatusMessage = null;
+        Status = null;
 
         if (SelectedProject is null)
         {
-            StatusMessage = "Select a project first.";
+            Status = StatusMessage.Error("Select a project first.");
             return;
         }
 
@@ -222,7 +222,7 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
 
             if (await db.TimePoints.AnyAsync(t => t.ProjectId == SelectedProject.Id && t.Name == name))
             {
-                StatusMessage = $"'{name}' already exists for this project.";
+                Status = StatusMessage.Error($"'{name}' already exists for this project.");
                 return;
             }
 
@@ -244,7 +244,7 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Couldn't add time point: {ex.Message}";
+            Status = StatusMessage.Error($"Couldn't add time point: {ex.Message}");
         }
     }
 }
