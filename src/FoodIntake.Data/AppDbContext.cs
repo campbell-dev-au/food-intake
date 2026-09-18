@@ -66,6 +66,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
           .HasForeignKey(c => c.ParentId)
           .OnDelete(DeleteBehavior.Restrict);
 
+        model.Entity<Category>()
+          .HasIndex(c => new { c.ParentId, c.Name })
+          .IsUnique();
+
+        model.Entity<Category>()
+            .HasIndex(c => new { c.SchemeId, c.Name })
+            .IsUnique()
+            .HasFilter("\"ParentId\" IS NULL");
+
         model.Entity<FoodCategory>()
           .HasKey(fc => new { fc.FoodId, fc.CategoryId });
 

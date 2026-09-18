@@ -7,5 +7,5 @@ public class Category
     public required Scheme Scheme { get; init; }
     public int? ParentId { get; init; }
     public Category? Parent { get; init; }
-    public string Name { get; init; } = "";
+    public string Name { get; set; } = "";
 }
