@@ -35,9 +35,12 @@ namespace FoodIntake.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
+                    b.HasIndex("ParentId", "Name")
+                        .IsUnique();
 
-                    b.HasIndex("SchemeId");
+                    b.HasIndex("SchemeId", "Name")
+                        .IsUnique()
+                        .HasFilter("\"ParentId\" IS NULL");
 
                     b.ToTable("Categories");
                 });
@@ -285,9 +288,6 @@ namespace FoodIntake.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsBuiltIn")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")

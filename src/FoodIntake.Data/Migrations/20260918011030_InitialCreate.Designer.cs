@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodIntake.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260831044556_InitialCreate")]
+    [Migration("20260918011030_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -126,7 +126,7 @@ namespace FoodIntake.Data.Migrations
                     b.HasIndex("DataSourceId", "ExternalFoodId")
                         .IsUnique();
 
-                    b.ToTable("Food");
+                    b.ToTable("Foods");
                 });
 
             modelBuilder.Entity("FoodIntake.Domain.FoodCategory", b =>
@@ -167,15 +167,23 @@ namespace FoodIntake.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("RemoteResourceId")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("TimePointId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
 
-                    b.HasIndex("RemoteResourceId")
+                    b.HasIndex("TimePointId");
+
+                    b.HasIndex("ProjectId", "RemoteResourceId")
                         .IsUnique();
 
                     b.ToTable("FoodRecords");
@@ -243,13 +251,43 @@ namespace FoodIntake.Data.Migrations
                     b.ToTable("Nutrients");
                 });
 
-            modelBuilder.Entity("FoodIntake.Domain.Scheme", b =>
+            modelBuilder.Entity("FoodIntake.Domain.Project", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsBuiltIn")
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("FoodIntake.Domain.ProjectClient", b =>
+                {
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ProjectId", "ClientId");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("ProjectClients");
+                });
+
+            modelBuilder.Entity("FoodIntake.Domain.Scheme", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -262,6 +300,57 @@ namespace FoodIntake.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Schemes");
+                });
+
+            modelBuilder.Entity("FoodIntake.Domain.TimePoint", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("TimePoints");
+                });
+
+            modelBuilder.Entity("FoodIntake.Domain.Upload", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ImportedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("LineCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TimePointId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TimePointId")
+                        .IsUnique();
+
+                    b.ToTable("Uploads");
                 });
 
             modelBuilder.Entity("FoodIntake.Domain.Category", b =>
@@ -336,7 +425,15 @@ namespace FoodIntake.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FoodIntake.Domain.TimePoint", "TimePoint")
+                        .WithMany()
+                        .HasForeignKey("TimePointId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Client");
+
+                    b.Navigation("TimePoint");
                 });
 
             modelBuilder.Entity("FoodIntake.Domain.LineNutrient", b =>
@@ -356,6 +453,47 @@ namespace FoodIntake.Data.Migrations
                     b.Navigation("ConsumptionLine");
 
                     b.Navigation("Nutrient");
+                });
+
+            modelBuilder.Entity("FoodIntake.Domain.ProjectClient", b =>
+                {
+                    b.HasOne("FoodIntake.Domain.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FoodIntake.Domain.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("FoodIntake.Domain.TimePoint", b =>
+                {
+                    b.HasOne("FoodIntake.Domain.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("FoodIntake.Domain.Upload", b =>
+                {
+                    b.HasOne("FoodIntake.Domain.TimePoint", "TimePoint")
+                        .WithMany()
+                        .HasForeignKey("TimePointId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TimePoint");
                 });
 
             modelBuilder.Entity("FoodIntake.Domain.ConsumptionLine", b =>
