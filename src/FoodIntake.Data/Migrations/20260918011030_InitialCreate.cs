@@ -26,7 +26,7 @@ namespace FoodIntake.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Food",
+                name: "Foods",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -37,7 +37,7 @@ namespace FoodIntake.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Food", x => x.Id);
+                    table.PrimaryKey("PK_Foods", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -69,13 +69,25 @@ namespace FoodIntake.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Projects",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Projects", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Schemes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    IsBuiltIn = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -83,22 +95,46 @@ namespace FoodIntake.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FoodRecords",
+                name: "ProjectClients",
+                columns: table => new
+                {
+                    ProjectId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ClientId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectClients", x => new { x.ProjectId, x.ClientId });
+                    table.ForeignKey(
+                        name: "FK_ProjectClients_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProjectClients_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TimePoints",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    ClientId = table.Column<int>(type: "INTEGER", nullable: false),
-                    RemoteResourceId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                    ProjectId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    SortOrder = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FoodRecords", x => x.Id);
+                    table.PrimaryKey("PK_TimePoints", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FoodRecords_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
+                        name: "FK_TimePoints_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -131,37 +167,52 @@ namespace FoodIntake.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Lines",
+                name: "FoodRecords",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    FoodId = table.Column<int>(type: "INTEGER", nullable: false),
-                    FoodRecordId = table.Column<int>(type: "INTEGER", nullable: false),
-                    DayName = table.Column<string>(type: "TEXT", nullable: false),
-                    DayDate = table.Column<DateOnly>(type: "TEXT", nullable: true),
-                    MealSectionId = table.Column<int>(type: "INTEGER", nullable: false),
-                    WeightG = table.Column<decimal>(type: "TEXT", nullable: false)
+                    ProjectId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ClientId = table.Column<int>(type: "INTEGER", nullable: false),
+                    TimePointId = table.Column<int>(type: "INTEGER", nullable: false),
+                    RemoteResourceId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Lines", x => x.Id);
+                    table.PrimaryKey("PK_FoodRecords", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Lines_FoodRecords_FoodRecordId",
-                        column: x => x.FoodRecordId,
-                        principalTable: "FoodRecords",
+                        name: "FK_FoodRecords_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Lines_Food_FoodId",
-                        column: x => x.FoodId,
-                        principalTable: "Food",
+                        name: "FK_FoodRecords_TimePoints_TimePointId",
+                        column: x => x.TimePointId,
+                        principalTable: "TimePoints",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Uploads",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    TimePointId = table.Column<int>(type: "INTEGER", nullable: false),
+                    FileName = table.Column<string>(type: "TEXT", nullable: false),
+                    ImportedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LineCount = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Uploads", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Lines_MealSections_MealSectionId",
-                        column: x => x.MealSectionId,
-                        principalTable: "MealSections",
+                        name: "FK_Uploads_TimePoints_TimePointId",
+                        column: x => x.TimePointId,
+                        principalTable: "TimePoints",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -186,9 +237,45 @@ namespace FoodIntake.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FoodCategories_Food_FoodId",
+                        name: "FK_FoodCategories_Foods_FoodId",
                         column: x => x.FoodId,
-                        principalTable: "Food",
+                        principalTable: "Foods",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Lines",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FoodId = table.Column<int>(type: "INTEGER", nullable: false),
+                    FoodRecordId = table.Column<int>(type: "INTEGER", nullable: false),
+                    DayName = table.Column<string>(type: "TEXT", nullable: false),
+                    DayDate = table.Column<DateOnly>(type: "TEXT", nullable: true),
+                    MealSectionId = table.Column<int>(type: "INTEGER", nullable: false),
+                    WeightG = table.Column<decimal>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Lines", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Lines_FoodRecords_FoodRecordId",
+                        column: x => x.FoodRecordId,
+                        principalTable: "FoodRecords",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Lines_Foods_FoodId",
+                        column: x => x.FoodId,
+                        principalTable: "Foods",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Lines_MealSections_MealSectionId",
+                        column: x => x.MealSectionId,
+                        principalTable: "MealSections",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -235,12 +322,6 @@ namespace FoodIntake.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Food_DataSourceId_ExternalFoodId",
-                table: "Food",
-                columns: new[] { "DataSourceId", "ExternalFoodId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_FoodCategories_CategoryId",
                 table: "FoodCategories",
                 column: "CategoryId");
@@ -251,9 +332,20 @@ namespace FoodIntake.Data.Migrations
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FoodRecords_RemoteResourceId",
+                name: "IX_FoodRecords_ProjectId_RemoteResourceId",
                 table: "FoodRecords",
-                column: "RemoteResourceId",
+                columns: new[] { "ProjectId", "RemoteResourceId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FoodRecords_TimePointId",
+                table: "FoodRecords",
+                column: "TimePointId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Foods_DataSourceId_ExternalFoodId",
+                table: "Foods",
+                columns: new[] { "DataSourceId", "ExternalFoodId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -289,9 +381,32 @@ namespace FoodIntake.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProjectClients_ClientId",
+                table: "ProjectClients",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_Name",
+                table: "Projects",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Schemes_Name",
                 table: "Schemes",
                 column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimePoints_ProjectId_Name",
+                table: "TimePoints",
+                columns: new[] { "ProjectId", "Name" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Uploads_TimePointId",
+                table: "Uploads",
+                column: "TimePointId",
                 unique: true);
         }
 
@@ -303,6 +418,12 @@ namespace FoodIntake.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "LineNutrients");
+
+            migrationBuilder.DropTable(
+                name: "ProjectClients");
+
+            migrationBuilder.DropTable(
+                name: "Uploads");
 
             migrationBuilder.DropTable(
                 name: "Categories");
@@ -320,13 +441,19 @@ namespace FoodIntake.Data.Migrations
                 name: "FoodRecords");
 
             migrationBuilder.DropTable(
-                name: "Food");
+                name: "Foods");
 
             migrationBuilder.DropTable(
                 name: "MealSections");
 
             migrationBuilder.DropTable(
                 name: "Clients");
+
+            migrationBuilder.DropTable(
+                name: "TimePoints");
+
+            migrationBuilder.DropTable(
+                name: "Projects");
         }
     }
 }
