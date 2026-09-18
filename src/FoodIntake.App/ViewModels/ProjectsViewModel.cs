@@ -216,7 +216,9 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
         {
             await using var db = await _dbContextFactory.CreateDbContextAsync();
 
-            if (await db.TimePoints.AnyAsync(t => t.ProjectId == SelectedProject.Id && t.Name == name))
+            if (await db.TimePoints.AnyAsync(
+                t => t.ProjectId == SelectedProject.Id && t.Name == name
+            ))
             {
                 Status = StatusMessage.Error($"'{name}' already exists for this project.");
                 return;
@@ -240,7 +242,7 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
         }
         catch (Exception ex)
         {
-            Status = StatusMessage.Error($"Couldn't add time point: {ex.Message}");
+            Status = StatusMessage.Exception("Couldn't add time point", ex);
         }
     }
 }

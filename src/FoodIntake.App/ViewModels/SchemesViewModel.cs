@@ -82,7 +82,10 @@ public partial class SchemesViewModel(
         Status = null;
         string name = NewSchemeName.Trim();
         if (name.Length == 0)
+        {
+            Status = StatusMessage.Error("Enter a name");
             return;
+        }
 
         try
         {
@@ -121,7 +124,10 @@ public partial class SchemesViewModel(
 
         string name = NewCategoryName.Trim();
         if (name.Length == 0)
+        {
+            Status = StatusMessage.Error("Enter a name");
             return;
+        }
 
         try
         {
@@ -144,6 +150,12 @@ public partial class SchemesViewModel(
                 ParentId = null, // @TODO: add sub category feature
                 Parent = null
             };
+            db.Categories.Add(category);
+            await db.SaveChangesAsync();
+
+            Categories.Add(category);
+            NewCategoryName = "";
+            SelectedCategory = category;
         }
         catch (Exception ex)
         {

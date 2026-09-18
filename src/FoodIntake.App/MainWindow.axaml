@@ -6,60 +6,112 @@
   xmlns:vm="using:FoodIntake.App.ViewModels"
   mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="450"
   x:Class="FoodIntake.App.MainWindow"
-  x:DataType="vm:ProjectsViewModel"
   Title="Food Intake"
   Width="900" Height="450"
 >
-  <Grid ColumnDefinitions="420,*" Margin="12">
-    <DockPanel Grid.Column="0" Margin="0,0,12,0">
-      <TextBlock DockPanel.Dock="Top" Text="Projects" FontWeight="Bold" Margin="0,0,0,6" />
-      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
-        <TextBox PlaceholderText="New project name" Text="{Binding NewProjectName, Mode=TwoWay}"
-          Width="150" />
-        <Button Content="Add" Command="{Binding AddProjectCommand}" Margin="6,0,0,0" />
-      </StackPanel>
-      <ListBox ItemsSource="{Binding Projects}"
-        SelectedItem="{Binding SelectedProject, Mode=TwoWay}">
-        <ListBox.ItemTemplate>
-          <DataTemplate x:DataType="domain:Project">
-            <TextBox Text="{Binding Name}" />
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-    </DockPanel>
+  <TabControl>
+    <TabItem Header="Projects">
+      <Grid ColumnDefinitions="420,*" Margin="12" x:DataType="vm:ProjectsViewModel">
+        <DockPanel Grid.Column="0" Margin="0,0,12,0">
+          <TextBlock DockPanel.Dock="Top" Text="Projects" FontWeight="Bold" Margin="0,0,0,6" />
+          <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
+            <TextBox PlaceholderText="New project name" Text="{Binding NewProjectName, Mode=TwoWay}"
+              Width="150" />
+            <Button Content="Add" Command="{Binding AddProjectCommand}" Margin="6,0,0,0" />
+          </StackPanel>
+          <ListBox ItemsSource="{Binding Projects}"
+            SelectedItem="{Binding SelectedProject, Mode=TwoWay}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="domain:Project">
+                <TextBox Text="{Binding Name}" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
 
-    <DockPanel Grid.Column="1">
-      <TextBlock DockPanel.Dock="Top" Text="Time Points" FontWeight="Bold" Margin="0,0,0,6" />
-      <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
-        <TextBlock
-          Classes="status"
-          Classes.error="{Binding Status.IsError, FallbackValue=False}"
-          Classes.success="{Binding Status.IsSuccess, FallbackValue=False}"
-          Text="{Binding Status.Text}"
-        />
-        <StackPanel Orientation="Horizontal">
-          <TextBox PlaceholderText="New time point name"
-            Text="{Binding NewTimePointName, Mode=TwoWay}" Width="150" />
-          <Button Content="Add" Command="{Binding AddTimePointCommand}" Margin="6,0,0,0" />
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-          <Button Content="Upload CSV…" Click="OnUploadClick" />
-          <Button Content="View" Click="OnViewClick" Margin="6,0,0,0" />
-          <Button Content="Clear" Click="OnClearClick" Margin="6,0,0,0" />
-        </StackPanel>
-      </StackPanel>
-
-      <ListBox ItemsSource="{Binding TimePoints}"
-        SelectedItem="{Binding SelectedTimePoint, Mode=TwoWay}">
-        <ListBox.ItemTemplate>
-          <DataTemplate x:DataType="vm:TimePointListItem">
-            <StackPanel>
-              <TextBlock Text="{Binding Name}" />
-              <TextBlock Text="{Binding Status}" Opacity="0.6" FontSize="11" />
+        <DockPanel Grid.Column="1">
+          <TextBlock DockPanel.Dock="Top" Text="Time Points" FontWeight="Bold" Margin="0,0,0,6" />
+          <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
+            <TextBlock
+              Classes="status"
+              Classes.error="{Binding Status.IsError, FallbackValue=False}"
+              Classes.success="{Binding Status.IsSuccess, FallbackValue=False}"
+              Text="{Binding Status.Text}"
+            />
+            <StackPanel Orientation="Horizontal">
+              <TextBox PlaceholderText="New time point name"
+                Text="{Binding NewTimePointName, Mode=TwoWay}" Width="150" />
+              <Button Content="Add" Command="{Binding AddTimePointCommand}" Margin="6,0,0,0" />
             </StackPanel>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-    </DockPanel>
-  </Grid>
+            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+              <Button Content="Upload CSV…" Click="OnUploadClick" />
+              <Button Content="View" Click="OnViewClick" Margin="6,0,0,0" />
+              <Button Content="Clear" Click="OnClearClick" Margin="6,0,0,0" />
+            </StackPanel>
+          </StackPanel>
+
+          <ListBox ItemsSource="{Binding TimePoints}"
+            SelectedItem="{Binding SelectedTimePoint, Mode=TwoWay}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:TimePointListItem">
+                <StackPanel>
+                  <TextBlock Text="{Binding Name}" />
+                  <TextBlock Text="{Binding Status}" Opacity="0.6" FontSize="11" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </Grid>
+    </TabItem> <!--Projects-->
+
+    <TabItem Header="Schemes" x:Name="SchemesTab">
+      <Grid ColumnDefinitions="420,*" Margin="12" x:DataType="vm:SchemesViewModel">
+        <DockPanel Grid.Column="0" Margin="0,0,12,0">
+          <TextBlock DockPanel.Dock="Top" Text="Schemes" FontWeight="Bold" Margin="0,0,0,6" />
+          <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
+            <TextBox PlaceholderText="New scheme name"
+              Text="{Binding NewSchemeName, Mode=TwoWay}" Width="150" />
+            <Button Content="Add" Command="{Binding AddSchemeCommand}" Margin="6,0,0,0" />
+          </StackPanel>
+          <ListBox ItemsSource="{Binding Schemes}"
+            SelectedItem="{Binding SelectedScheme, Mode=TwoWay}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="domain:Scheme">
+                <TextBlock Text="{Binding Name}" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+
+        <DockPanel Grid.Column="1">
+          <TextBlock DockPanel.Dock="Top" Text="Categories" FontWeight="Bold" Margin="0,0,0,6" />
+          <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
+            <TextBlock
+              Classes="status"
+              Classes.error="{Binding Status.IsError, FallbackValue=False}"
+              Classes.success="{Binding Status.IsSuccess, FallbackValue=False}"
+              Text="{Binding Status.Text}"
+            />
+            <StackPanel Orientation="Horizontal">
+              <TextBox PlaceholderText="New category name"
+                Text="{Binding NewCategoryName, Mode=TwoWay}" Width="150" />
+              <Button Content="Add" Command="{Binding AddCategoryCommand}" Margin="6,0,0,0" />
+            </StackPanel>
+          </StackPanel>
+
+          <ListBox ItemsSource="{Binding Categories}"
+            SelectedItem="{Binding SelectedCategory, Mode=TwoWay}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="domain:Category">
+                <StackPanel>
+                  <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </Grid>
+    </TabItem> <!--Schemes-->
+  </TabControl>
 </Window>
