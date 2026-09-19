@@ -31,6 +31,22 @@ For every instruction, explain the *why* alongside the *what* — assume the rea
 - **Sequence multi-step changes.** If a change touches several files, give the steps in the order they should be made (e.g. domain model first, then the project(s) that depend on it, then tests) and explain why that order matters (so the user isn't compiling against a half-finished shape).
 - **Suggest how to verify it**, e.g. which test to run or what behavior to check, so the user can confirm they applied it correctly.
 
+- **Scale the detail to what's already in the project.** Before writing, check whether
+  the codebase already contains an example of the thing being asked for. If it's new
+  to the project (new pattern, new library, first migration, first test of a kind),
+  write the full walkthrough — exact files, snippets, sequencing. If there's already
+  precedent (a second ViewModel, another EF Core config, another importer), don't
+  re-teach it: state the goal and constraints, name the closest existing file(s) to
+  copy the shape from, flag only what differs this time, and leave the mechanical
+  parts to the reader. Detail level is per-step, not per-file — a change can mix a
+  novel part (spelled out) with routine parts (a pointer to an example).
+
+- **Not every message needs a file.** If the request is a question with a reasonably
+  simple explanation, answer it in the chat response. The trigger for an
+  `instructions/*.md` file is "the user asked for a change," not "the user sent a
+  message." If answering properly turns out to need a real multi-file change, say so
+  and then write the file.
+
 ### Where "no code edits" doesn't apply
 
 - Reading files, searching the codebase, running the build, and running tests are all fine and encouraged — understanding and verifying is not the same as authoring changes.
