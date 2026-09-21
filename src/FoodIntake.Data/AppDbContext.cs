@@ -19,6 +19,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<FoodCategory> FoodCategories => Set<FoodCategory>();
     public DbSet<Upload> Uploads => Set<Upload>();
+    public DbSet<ProjectScheme> ProjectSchemes => Set<ProjectScheme>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
