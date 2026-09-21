@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,9 +16,11 @@ namespace FoodIntake.App.ViewModels;
 public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContextFactory) : ObservableObject
 {
     private readonly IDbContextFactory<AppDbContext> _dbContextFactory = dbContextFactory;
+    private bool _revertingAssignment;
 
     public ObservableCollection<Project> Projects { get; } = [];
     public ObservableCollection<TimePointListItem> TimePoints { get; } = [];
+    public ObservableCollection<SchemeAssignment> SchemeAssignments { get; } = [];
 
     [ObservableProperty]
     public partial TimePointListItem? SelectedTimePoint { get; set; }
@@ -83,6 +86,7 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
     partial void OnSelectedProjectChanged(Project? value)
     {
         _ = LoadTimePointsAsync();
+        _ = LoadSchemeAssignmsnAsync();
     }
 
     private async Task LoadTimePointsAsync()
@@ -243,6 +247,93 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
         catch (Exception ex)
         {
             Status = StatusMessage.Exception("Couldn't add time point", ex);
+        }
+    }
+
+    private async Task ApplySchemeAssignmentAsync(SchemeAssignment assignment)
+    {
+        Status = null;
+
+        if (SelectedProject is null)
+            return;
+
+        int projectId = SelectedProject.Id;
+
+        try
+        {
+            await using var db = await _dbContextFactory.CreateDbContextAsync();
+
+            if (assignment.IsAssigned)
+            {
+                db.ProjectSchemes.Add(new ProjectScheme { ProjectId = projectId, SchemeId = assignment.Id });
+                await db.SaveChangesAsync();
+            }
+            else
+            {
+                await db.ProjectSchemes
+                    .Where(ps => ps.ProjectId == projectId && ps.SchemeId == assignment.Id)
+                    .ExecuteDeleteAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Status = StatusMessage.Exception("Couldn't update scheme assignment", ex);
+
+            _revertingAssignment = true;
+            assignment.IsAssigned = !assignment.IsAssigned;
+            _revertingAssignment = false;
+        }
+    }
+
+    private void OnSchemeAssignmentChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (_revertingAssignment)
+            return;
+
+        if (e.PropertyName != nameof(SchemeAssignment.IsAssigned))
+            return;
+
+        if (sender is not SchemeAssignment assignment)
+            return;
+
+        _ = ApplySchemeAssignmentAsync(assignment);
+    }
+
+    private async Task LoadSchemeAssignmsnAsync()
+    {
+        foreach (SchemeAssignment existing in SchemeAssignments)
+            existing.PropertyChanged -= OnSchemeAssignmentChanged;
+
+        SchemeAssignments.Clear();
+
+        if (SelectedProject is null)
+            return;
+
+        try
+        {
+            await using var db = await _dbContextFactory.CreateDbContextAsync();
+
+            List<Scheme> schemes = await db.Schemes.OrderBy(s => s.Name).ToListAsync();
+
+            HashSet<int> assignedIds = await db.ProjectSchemes
+                .Where(ps => ps.ProjectId == SelectedProject.Id)
+                .Select(ps => ps.SchemeId)
+                .ToHashSetAsync();
+
+            foreach (Scheme scheme in schemes)
+            {
+                SchemeAssignment assignment = new(scheme)
+                {
+                    IsAssigned = assignedIds.Contains(scheme.Id)
+                };
+
+                assignment.PropertyChanged += OnSchemeAssignmentChanged;
+                SchemeAssignments.Add(assignment);
+            }
+        }
+        catch (Exception ex)
+        {
+            Status = StatusMessage.Exception("Couldn't load scheme assignment", ex);
         }
     }
 }
