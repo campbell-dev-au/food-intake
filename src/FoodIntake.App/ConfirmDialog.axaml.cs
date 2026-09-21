@@ -14,7 +14,7 @@ public partial class ConfirmDialog : Window
     public static Task<bool> AskAsync(Window owner, string message)
     {
         var dialog = new ConfirmDialog();
-        dialog.FindControl<TextBlock>("MessageText")!.Text = message;
+        dialog.MessageText.Text = message;
         return dialog.ShowDialog<bool>(owner);
     }
 

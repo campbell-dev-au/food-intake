@@ -10,62 +10,88 @@
   Width="900" Height="450"
 >
   <TabControl>
-    <TabItem Header="Projects">
-      <Grid ColumnDefinitions="420,*" Margin="12" x:DataType="vm:ProjectsViewModel">
-        <DockPanel Grid.Column="0" Margin="0,0,12,0">
-          <TextBlock DockPanel.Dock="Top" Text="Projects" FontWeight="Bold" Margin="0,0,0,6" />
-          <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
-            <TextBox PlaceholderText="New project name" Text="{Binding NewProjectName, Mode=TwoWay}"
-              Width="150" />
-            <Button Content="Add" Command="{Binding AddProjectCommand}" Margin="6,0,0,0" />
-          </StackPanel>
-          <ListBox ItemsSource="{Binding Projects}"
-            SelectedItem="{Binding SelectedProject, Mode=TwoWay}">
-            <ListBox.ItemTemplate>
+    <TabItem Header="Project">
+      <DockPanel Margin="12" x:DataType="vm:ProjectsViewModel">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
+          <TextBlock Text="Project" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0" />
+          <ComboBox ItemsSource="{Binding Projects}"
+            SelectedItem="{Binding SelectedProject, Mode=TwoWay}"
+            MinWidth="240">
+            <ComboBox.ItemTemplate>
               <DataTemplate x:DataType="domain:Project">
-                <TextBox Text="{Binding Name}" />
+                <TextBlock Text="{Binding Name}" />
               </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-        </DockPanel>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <Button Content="New…" Click="OnNewProjectClick" Margin="8,0,0,0" />
+          <Button Content="Rename…" Click="OnRenameProjectClick" Margin="6,0,0,0" />
+        </StackPanel>
 
-        <DockPanel Grid.Column="1">
-          <TextBlock DockPanel.Dock="Top" Text="Time Points" FontWeight="Bold" Margin="0,0,0,6" />
-          <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
-            <TextBlock
-              Classes="status"
-              Classes.error="{Binding Status.IsError, FallbackValue=False}"
-              Classes.success="{Binding Status.IsSuccess, FallbackValue=False}"
-              Text="{Binding Status.Text}"
-            />
-            <StackPanel Orientation="Horizontal">
-              <TextBox PlaceholderText="New time point name"
-                Text="{Binding NewTimePointName, Mode=TwoWay}" Width="150" />
-              <Button Content="Add" Command="{Binding AddTimePointCommand}" Margin="6,0,0,0" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-              <Button Content="Upload CSV…" Click="OnUploadClick" />
-              <Button Content="View" Click="OnViewClick" Margin="6,0,0,0" />
-              <Button Content="Clear" Click="OnClearClick" Margin="6,0,0,0" />
-            </StackPanel>
-          </StackPanel>
-
-          <ListBox ItemsSource="{Binding TimePoints}"
-            SelectedItem="{Binding SelectedTimePoint, Mode=TwoWay}">
-            <ListBox.ItemTemplate>
-              <DataTemplate x:DataType="vm:TimePointListItem">
-                <StackPanel>
-                  <TextBlock Text="{Binding Name}" />
-                  <TextBlock Text="{Binding Status}" Opacity="0.6" FontSize="11" />
+        <TabControl>
+          <TabItem Header="Time Points">
+            <DockPanel>
+              <TextBlock DockPanel.Dock="Top" Text="Time Points" FontWeight="Bold" Margin="0,0,0,6" />
+              <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
+                <TextBlock
+                  Classes="status"
+                  Classes.error="{Binding Status.IsError, FallbackValue=False}"
+                  Classes.success="{Binding Status.IsSuccess, FallbackValue=False}"
+                  Text="{Binding Status.Text}"
+                />
+                <StackPanel Orientation="Horizontal">
+                  <TextBox PlaceholderText="New time point name"
+                    Text="{Binding NewTimePointName, Mode=TwoWay}" Width="150" />
+                  <Button Content="Add" Command="{Binding AddTimePointCommand}" Margin="6,0,0,0" />
                 </StackPanel>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-        </DockPanel>
-      </Grid>
+                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                  <Button Content="Upload CSV…" Click="OnUploadClick" />
+                  <Button Content="View" Click="OnViewClick" Margin="6,0,0,0" />
+                  <Button Content="Clear" Click="OnClearClick" Margin="6,0,0,0" />
+                </StackPanel>
+              </StackPanel>
+
+              <ListBox ItemsSource="{Binding TimePoints}"
+                SelectedItem="{Binding SelectedTimePoint, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:TimePointListItem">
+                    <StackPanel>
+                      <TextBlock Text="{Binding Name}" />
+                      <TextBlock Text="{Binding Status}" Opacity="0.6" FontSize="11" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </DockPanel>
+          </TabItem>
+          <TabItem Header="Schemes">
+            <DockPanel Margin="12">
+              <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Margin="0,0,0,2"
+                Text="Schemes used by this project" />
+              <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding SchemeAssignments}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SchemeAssignment">
+                      <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,6">
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding Name}" />
+                          <TextBlock Text="{Binding CategorySummary}" Opacity="0.6" FontSize="11" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding IsAssigned, Mode=TwoWay}"
+                          OnContent="" OffContent="" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+
+            </DockPanel>
+          </TabItem>
+        </TabControl>
+      </DockPanel>
     </TabItem> <!--Projects-->
 
-    <TabItem Header="Schemes" x:Name="SchemesTab">
+    <TabItem Header="Scheme Library" x:Name="SchemesTab">
       <Grid ColumnDefinitions="420,*" Margin="12" x:DataType="vm:SchemesViewModel">
         <DockPanel Grid.Column="0" Margin="0,0,12,0">
           <TextBlock DockPanel.Dock="Top" Text="Schemes" FontWeight="Bold" Margin="0,0,0,6" />

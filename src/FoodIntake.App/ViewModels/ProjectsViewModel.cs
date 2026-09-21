@@ -26,9 +26,6 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
     public partial TimePointListItem? SelectedTimePoint { get; set; }
 
     [ObservableProperty]
-    public partial string NewProjectName { get; set; } = "";
-
-    [ObservableProperty]
     public partial string NewTimePointName { get; set; } = "";
 
     [ObservableProperty]
@@ -122,11 +119,9 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
         }
     }
 
-    [RelayCommand]
-    private async Task AddProjectAsync()
+    public async Task AddProjectAsync(string name)
     {
         Status = null;
-        var name = NewProjectName.Trim();
         if (name.Length == 0)
             return;
 
@@ -145,12 +140,46 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
             await db.SaveChangesAsync();
 
             Projects.Add(project);
-            NewProjectName = "";
             SelectedProject = project;
         }
         catch (Exception ex)
         {
             Status = StatusMessage.Error($"Couldn't add project: {ex.Message}");
+        }
+    }
+
+    public async Task RenameProjectAsync(string name)
+    {
+        Status = null;
+
+        if (SelectedProject is null)
+        {
+            Status = StatusMessage.Error("Select a project first.");
+            return;
+        }
+
+        int projectId = SelectedProject.Id;
+
+        try
+        {
+            await using var db = await _dbContextFactory.CreateDbContextAsync();
+
+            if (await db.Projects.AnyAsync(p => p.Name == name && p.Id != projectId))
+            {
+                Status = StatusMessage.Error($"A project named '{name}' already exists.");
+                return;
+            }
+
+            Project project = await db.Projects.SingleAsync(p => p.Id == projectId);
+            project.Name = name;
+            await db.SaveChangesAsync();
+
+            await LoadProjectsAsync();
+            SelectedProject = Projects.FirstOrDefault(p => p.Id == projectId);
+        }
+        catch (Exception ex)
+        {
+            Status = StatusMessage.Exception("Couldn't rename project", ex);
         }
     }
 
@@ -320,11 +349,17 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
                 .Select(ps => ps.SchemeId)
                 .ToHashSetAsync();
 
+            Dictionary<int, int> categoryCounts = await db.Categories
+                .GroupBy(c => c.SchemeId)
+                .Select(g => new { SchemeId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(g => g.SchemeId, g => g.Count);
+
             foreach (Scheme scheme in schemes)
             {
                 SchemeAssignment assignment = new(scheme)
                 {
-                    IsAssigned = assignedIds.Contains(scheme.Id)
+                    IsAssigned = assignedIds.Contains(scheme.Id),
+                    CategoryCount = categoryCounts.GetValueOrDefault(scheme.Id)
                 };
 
                 assignment.PropertyChanged += OnSchemeAssignmentChanged;
