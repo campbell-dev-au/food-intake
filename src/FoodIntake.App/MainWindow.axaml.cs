@@ -62,4 +62,28 @@ public partial class MainWindow : Window
 
         await viewModel.ClearUploadAsync();
     }
+
+    private async void OnNewProjectClick(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel is not { } viewModel)
+            return;
+
+        string? name = await PromptDialog.AskAsync(this, "Name for the new project:");
+        if (name is null)
+            return;
+
+        await viewModel.AddProjectAsync(name);
+    }
+
+    private async void OnRenameProjectClick(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel is not { SelectedProject: { } project } viewModel)
+            return;
+
+        string? name = await PromptDialog.AskAsync(this, "New name:", project.Name);
+        if (name is null)
+            return;
+
+        await viewModel.RenameProjectAsync(name);
+    }
 }
