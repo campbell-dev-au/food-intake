@@ -63,6 +63,7 @@
               </ListBox>
             </DockPanel>
           </TabItem>
+
           <TabItem Header="Schemes">
             <DockPanel Margin="12">
               <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Margin="0,0,0,2"
@@ -86,6 +87,56 @@
               </ScrollViewer>
 
             </DockPanel>
+          </TabItem>
+
+          <TabItem Header="Foods">
+            <Grid DataContext="{Binding FoodCategorisation}">
+              <DockPanel x:DataType="vm:FoodCategorisationViewModel" Margin="12">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                  <TextBlock Text="Scheme" FontWeight="Bold" VerticalAlignment="Center"
+                    Margin="0,0,10,0" />
+                  <ComboBox ItemsSource="{Binding Schemes}"
+                    SelectedItem="{Binding SelectedScheme, Mode=TwoWay}"
+                    PlaceholderText="Select a scheme"
+                    MinWidth="240">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate x:DataType="domain:Scheme">
+                        <TextBlock Text="{Binding Name}" />
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                </StackPanel>
+          
+                <TextBlock DockPanel.Dock="Bottom"
+                  Classes="status"
+                  Classes.error="{Binding Status.IsError, FallbackValue=False}"
+                  Classes.success="{Binding Status.IsSuccess, FallbackValue=False}"
+                  Text="{Binding Status.Text}"
+                />
+          
+                <ListBox ItemsSource="{Binding Foods}">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:FoodCategoryAssignment">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding Name}" TextWrapping="Wrap" />
+                          <TextBlock Text="{Binding UsageSummary}" Opacity="0.6" FontSize="11" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" MinWidth="200" VerticalAlignment="Center"
+                          ItemsSource="{Binding Choices}"
+                          SelectedItem="{Binding SelectedChoice, Mode=TwoWay}">
+                          <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:CategoryChoice">
+                              <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                          </ComboBox.ItemTemplate>
+                        </ComboBox>
+                      </Grid>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </DockPanel>
+            </Grid>
           </TabItem>
         </TabControl>
       </DockPanel>

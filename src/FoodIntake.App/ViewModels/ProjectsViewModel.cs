@@ -17,6 +17,7 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
 {
     private readonly IDbContextFactory<AppDbContext> _dbContextFactory = dbContextFactory;
     private bool _revertingAssignment;
+    public FoodCategorisationViewModel FoodCategorisation { get; } = new(dbContextFactory);
 
     public ObservableCollection<Project> Projects { get; } = [];
     public ObservableCollection<TimePointListItem> TimePoints { get; } = [];
@@ -84,6 +85,7 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
     {
         _ = LoadTimePointsAsync();
         _ = LoadSchemeAssignmsnAsync();
+        _ = FoodCategorisation.LoadAsync(value?.Id);
     }
 
     private async Task LoadTimePointsAsync()
@@ -303,6 +305,8 @@ public partial class ProjectsViewModel(IDbContextFactory<AppDbContext> dbContext
                     .Where(ps => ps.ProjectId == projectId && ps.SchemeId == assignment.Id)
                     .ExecuteDeleteAsync();
             }
+
+            await FoodCategorisation.LoadAsync(projectId);
         }
         catch (Exception ex)
         {

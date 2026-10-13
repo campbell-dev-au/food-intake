@@ -131,15 +131,21 @@ namespace FoodIntake.Data.Migrations
 
             modelBuilder.Entity("FoodIntake.Domain.FoodCategory", b =>
                 {
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("FoodId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int>("SchemeId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("AssignedBy")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<decimal?>("Confidence")
                         .HasColumnType("TEXT");
@@ -147,9 +153,11 @@ namespace FoodIntake.Data.Migrations
                     b.Property<DateTime?>("ConfirmedAt")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("FoodId", "CategoryId");
+                    b.HasKey("ProjectId", "FoodId", "SchemeId");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("FoodId");
+
+                    b.HasIndex("CategoryId", "SchemeId");
 
                     b.ToTable("FoodCategories");
                 });
@@ -415,21 +423,30 @@ namespace FoodIntake.Data.Migrations
 
             modelBuilder.Entity("FoodIntake.Domain.FoodCategory", b =>
                 {
-                    b.HasOne("FoodIntake.Domain.Category", "Category")
+                    b.HasOne("FoodIntake.Domain.Food", "Food")
                         .WithMany()
-                        .HasForeignKey("CategoryId")
+                        .HasForeignKey("FoodId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FoodIntake.Domain.Food", "Food")
-                        .WithMany("Categories")
-                        .HasForeignKey("FoodId")
+                    b.HasOne("FoodIntake.Domain.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FoodIntake.Domain.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId", "SchemeId")
+                        .HasPrincipalKey("Id", "SchemeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
 
                     b.Navigation("Food");
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("FoodIntake.Domain.FoodRecord", b =>
@@ -533,11 +550,6 @@ namespace FoodIntake.Data.Migrations
             modelBuilder.Entity("FoodIntake.Domain.ConsumptionLine", b =>
                 {
                     b.Navigation("Nutrients");
-                });
-
-            modelBuilder.Entity("FoodIntake.Domain.Food", b =>
-                {
-                    b.Navigation("Categories");
                 });
 #pragma warning restore 612, 618
         }

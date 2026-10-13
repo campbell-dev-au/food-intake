@@ -19,5 +19,7 @@ internal sealed class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.HasIndex(c => new { c.SchemeId, c.Name })
             .IsUnique()
             .HasFilter("\"ParentId\" IS NULL");
+
+        builder.HasAlternateKey(c => new { c.Id, c.SchemeId });
     }
 }

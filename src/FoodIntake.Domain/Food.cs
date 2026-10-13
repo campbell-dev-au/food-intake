@@ -6,5 +6,4 @@ public class Food
     public string DataSourceId { get; init; } = "";
     public string ExternalFoodId { get; init; } = "";
     public string Name { get; set; } = "";
-    public ICollection<FoodCategory> Categories { get; init; } = new List<FoodCategory>();
 }
